@@ -6,7 +6,7 @@ import React from 'react';
 declare namespace Resizable {
   type ResizableDirection = Direction;
   type ElementRect = Graphics.ElementRect;
-  type ResizeBounds = Omit<ElementRect, 'width' | 'height' | 'x' | 'y'>;
+  type ResizableBounds = Omit<ElementRect, 'width' | 'height' | 'x' | 'y'>;
 
   interface Enable {
     top?: boolean;
@@ -61,19 +61,22 @@ declare namespace Resizable {
     backgroundStyle: React.CSSProperties;
   }
 
-  interface Delta {
+  interface ResizableDelta {
     position: Position;
-    size: Size,
-    rotate: number;
+    size: Size;
   }
+
+  type ResizeCallback = (
+    event: MouseEvent,
+    direction: Direction,
+    delta: ResizableDelta,
+  ) => void;
 
   type ResizeStartCallback = (
     e: React.MouseEvent,
     dir: ResizableDirection,
-    delta: Delta,
+    delta: ResizableDelta,
   ) => void | boolean;
-
-  type ResizeCallback = (event: MouseEvent, direction: ResizableDirection, delta: Delta) => void;
 
   export interface ResizableProps {
     as?: string | React.ComponentType<any>;

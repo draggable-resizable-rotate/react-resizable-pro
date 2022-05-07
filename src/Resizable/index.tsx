@@ -1,6 +1,6 @@
 import React from 'react';
 import { Resizer, Direction } from './resizer';
-import Graphics, {
+import {
   Matrix,
   Line,
   Rect,
@@ -11,11 +11,11 @@ import Graphics, {
   DirectionType,
   LineDirection,
   Size,
-  Position
+  Position,
+  ElementRect,
 } from '@shepijcanwu/graphics';
 
 export type ResizableDirection = Direction;
-export type ElementRect = Graphics.ElementRect;
 export type ResizableBounds = Omit<ElementRect, 'width' | 'height' | 'x' | 'y'>;
 
 interface MinMaxSize {
@@ -63,7 +63,6 @@ export interface HandleClassName {
   topLeft?: string;
 }
 
-
 export interface HandleComponent {
   top?: React.ReactElement<any>;
   right?: React.ReactElement<any>;
@@ -75,14 +74,21 @@ export interface HandleComponent {
   topLeft?: React.ReactElement<any>;
 }
 
-export type Delta = Required<Pick<State, 'size' | 'position' | 'rotate'>>;
+export interface ResizableDelta {
+  position: Position;
+  size: Size;
+}
 
-export type ResizeCallback = (event: MouseEvent, direction: Direction, delta: Delta) => void;
+export type ResizeCallback = (
+  event: MouseEvent,
+  direction: Direction,
+  delta: ResizableDelta,
+) => void;
 
 export type ResizeStartCallback = (
   e: React.MouseEvent,
   dir: Direction,
-  delta: Delta,
+  delta: ResizableDelta,
 ) => void | boolean;
 
 export interface ResizableProps {
@@ -123,7 +129,7 @@ export interface ResizableProps {
   priorityStyle?: React.CSSProperties;
 }
 
-interface State {
+interface ResizableState {
   isResizing: boolean;
   size?: Size;
   position?: Position;
@@ -131,8 +137,6 @@ interface State {
   scale?: number;
   backgroundStyle: React.CSSProperties;
 }
-
-export type ResizableState = State;
 
 const definedProps = [
   'as',
@@ -193,7 +197,6 @@ interface MouseDownCache {
   ratio?: number;
 }
 
-
 const { parseMatrix } = Matrix;
 
 const {
@@ -211,7 +214,7 @@ const {
   getPointToLineDistance,
 } = Line;
 
-export default class Resizable extends React.PureComponent<ResizableProps, State> {
+export default class Resizable extends React.PureComponent<ResizableProps, ResizableState> {
   resizableRef: React.RefObject<HTMLElement>;
 
   mouseDownCache: MouseDownCache;
@@ -251,7 +254,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
     const { position, size } = state;
     const element = this.resizableRef.current as HTMLElement;
 
-    const newState: Partial<Pick<State, 'position' | 'size' | 'rotate'>> = {};
+    const newState: Partial<Pick<ResizableState, 'position' | 'size' | 'rotate'>> = {};
     // 如果没有初始size
     if (!size) {
       Object.assign(newState, {
@@ -360,7 +363,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
   }
 
   getRotateElementRect(clientPoint: ClientPoint, direction: Direction) {
-    const { rotate } = this.state as Required<State>;
+    const { rotate } = this.state as Required<ResizableState>;
     const { lockAspectRatio, resizeRatio = 1, scale = 1 } = this.props;
     const hRotate = rotate;
     const vRotate = 90 + rotate;
@@ -444,7 +447,9 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
   onMouseDown(event: React.MouseEvent, direction: Direction) {
     const position = (this.props.position || this.state.position) as Position;
     const size = (this.props.size || this.state.size) as Size;
-    const rotate = (this.props.rotate !== undefined ? this.props.rotate : this.state.rotate) as number;
+    const rotate = (
+      this.props.rotate !== undefined ? this.props.rotate : this.state.rotate
+    ) as number;
     const scale = (this.props.scale !== undefined ? this.props.scale : this.state.scale) as number;
     const { clientX, clientY } = event;
     const { lockAspectRatio } = this.props;
@@ -463,7 +468,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
     };
     this.mouseDownCache.minMaxSize = this.getJudgeSize();
     // 同步数据
-    const state: State = {
+    const state: ResizableState = {
       isResizing: true,
       backgroundStyle: {
         ...this.state.backgroundStyle,
@@ -483,7 +488,6 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
         JSON.stringify({
           position,
           size,
-          rotate,
         }),
       ),
     );
@@ -491,7 +495,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
 
   // 暂时不考虑各种grid的让步
   onMouseMove(event: MouseEvent, direction: Direction) {
-    const { rotate, size: oldSize } = this.state as Required<State>;
+    const { size: oldSize } = this.state as Required<ResizableState>;
     const { lockAspectRatio, canResizable = true } = this.props;
     if (!canResizable) return;
     const { ratio, minMaxSize, bounds } = this.mouseDownCache as Required<MouseDownCache>;
@@ -529,10 +533,9 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
       });
     }
     // 是对象的拷贝暴露出去，防止副作用
-    const delta: Delta = {
+    const delta: ResizableDelta = {
       size: { ...validSize },
       position: { ...validPosition },
-      rotate: rotate || 0,
     };
 
     const shouldUpdate = this.props.onResize?.(event, direction, JSON.parse(JSON.stringify(delta)));
@@ -541,11 +544,10 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
   }
 
   onMouseUp(event: MouseEvent, direction: Direction) {
-    const { size, position, rotate } = this.state as Required<State>;
-    const delta: Delta = {
+    const { size, position } = this.state as Required<ResizableState>;
+    const delta: ResizableDelta = {
       size: { ...size },
       position: { ...position },
-      rotate,
     };
 
     this.setState({
@@ -593,7 +595,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
         minHeight,
       };
     }
-    if(typeof bounds === 'object') {
+    if (typeof bounds === 'object') {
       return {
         maxWidth: bounds.right - bounds.left,
         maxHeight: bounds.bottom - bounds.top,
