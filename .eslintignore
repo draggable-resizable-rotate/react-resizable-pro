@@ -1,0 +1,10 @@
+# npm 包
+/node_modules
+
+# public
+/public
+
+# 打包文件
+/dist
+/build
+/example
