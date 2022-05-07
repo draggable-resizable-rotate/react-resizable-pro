@@ -10,11 +10,13 @@ import Graphics, {
   LineEquation,
   DirectionType,
   LineDirection,
+  Size,
+  Position
 } from '@shepijcanwu/graphics';
 
-export type ResizeDirection = Direction;
+export type ResizableDirection = Direction;
 export type ElementRect = Graphics.ElementRect;
-export type ResizeBounds = Omit<ElementRect, 'width' | 'height' | 'x' | 'y'>;
+export type ResizableBounds = Omit<ElementRect, 'width' | 'height' | 'x' | 'y'>;
 
 interface MinMaxSize {
   minWidth?: number;
@@ -26,13 +28,6 @@ interface MinMaxSize {
 interface ClientPoint {
   clientX: number;
   clientY: number;
-}
-
-interface Bounds {
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
 }
 
 export interface Enable {
@@ -68,25 +63,6 @@ export interface HandleClassName {
   topLeft?: string;
 }
 
-export interface Size {
-  width: number;
-  height: number;
-}
-
-export interface Position {
-  left: number;
-  top: number;
-}
-
-export interface NumberSize {
-  width: number;
-  height: number;
-}
-
-export interface Position {
-  left: number;
-  top: number;
-}
 
 export interface HandleComponent {
   top?: React.ReactElement<any>;
@@ -119,7 +95,7 @@ export interface ResizableProps {
     y?: number[];
   };
   snapGap?: number;
-  bounds?: string | ResizeBounds;
+  bounds?: string | ResizableBounds;
   // 添加需要的状态
   size?: Size;
   position?: Position;
@@ -193,7 +169,7 @@ const definedProps = [
 ];
 
 interface MouseDownCache {
-  bounds?: Bounds | null;
+  bounds?: ResizableBounds | null;
   minMaxSize?: MinMaxSize;
   rotateData?: {
     rotateRect: ReturnType<typeof getRotateRectPoints>;
@@ -593,7 +569,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
   }
 
   // 通过bounds获取有效位置
-  getValidPosition(position: Position, bounds: ResizeBounds) {
+  getValidPosition(position: Position, bounds: ResizableBounds) {
     let { left, top } = position;
     left = Math.max(bounds.left, left);
     left = Math.min(bounds.right, left);
@@ -667,7 +643,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
   }
 
   // 判断边界
-  getJudgeBounds(validPosition: Position): ResizeBounds | null {
+  getJudgeBounds(validPosition: Position): ResizableBounds | null {
     const { bounds } = this.props;
     if (!bounds) return null;
     if (typeof bounds === 'object') {

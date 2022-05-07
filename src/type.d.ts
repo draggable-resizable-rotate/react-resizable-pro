@@ -1,58 +1,128 @@
-import Graphics from '@shepijcanwu/graphics';
-import DraggableProvider, { MouseEventPoint } from '@shepijcanwu/react-draggable-provider';
-declare namespace Draggable {
-  interface DraggableHandleFunMap {
-    onMouseDown: (event: React.MouseEvent, delta: Delta, position: Position) => any;
-    onMouseMove: (event: MouseEvent, delta: Delta, position: Position) => any;
-    onMouseUp: (event: MouseEvent, delta: Delta, position: Position) => any;
-  }
-  type DraggableMouseHandle = DraggableHandleFunMap;
-  type DraggableBounds = Omit<Graphics.ElementRect, 'width' | 'height' | 'x' | 'y'>;
+import Graphics, {
+  Direction, Size, Position,
+} from '@shepijcanwu/graphics';
 
-  type DraggableProps = Partial<DraggableMouseHandle> & {
-    position?: Position;
-    // 默认的 position，一次性效果
-    defaultPosition?: Position;
-    axis?: 'both' | 'x' | 'y' | 'none';
-    handle?: string;
-    grid?: [number, number];
-    // 'window' | 'parent' | elementSelector | DraggableBounds
-    bounds?: string | DraggableBounds;
-    nodeRef?: React.RefObject<HTMLElement>;
-    enableUserSelectHack?: boolean;
-    scale?: number;
-    canMoveable?: boolean;
-    rotate?: number;
-    moveRatio?: number;
-    children?: React.ReactElement;
-  };
+import React from 'react';
+declare namespace Resizable {
+  type ResizableDirection = Direction;
+  type ElementRect = Graphics.ElementRect;
+  type ResizeBounds = Omit<ElementRect, 'width' | 'height' | 'x' | 'y'>;
 
-  type ClientPoint = MouseEventPoint;
-
-  interface DraggableState {
-    position?: Position;
-    rotate?: number;
-    scale?: number;
-    dragging: boolean;
+  interface Enable {
+    top?: boolean;
+    right?: boolean;
+    bottom?: boolean;
+    left?: boolean;
+    topRight?: boolean;
+    bottomRight?: boolean;
+    bottomLeft?: boolean;
+    topLeft?: boolean;
   }
 
-  interface MouseDownCache {
-    clientPoint: ClientPoint;
+  interface HandleStyles {
+    top?: React.CSSProperties;
+    right?: React.CSSProperties;
+    bottom?: React.CSSProperties;
+    left?: React.CSSProperties;
+    topRight?: React.CSSProperties;
+    bottomRight?: React.CSSProperties;
+    bottomLeft?: React.CSSProperties;
+    topLeft?: React.CSSProperties;
+  }
+
+  interface HandleClassName {
+    top?: string;
+    right?: string;
+    bottom?: string;
+    left?: string;
+    topRight?: string;
+    bottomRight?: string;
+    bottomLeft?: string;
+    topLeft?: string;
+  }
+
+  interface HandleComponent {
+    top?: React.ReactElement<any>;
+    right?: React.ReactElement<any>;
+    bottom?: React.ReactElement<any>;
+    left?: React.ReactElement<any>;
+    topRight?: React.ReactElement<any>;
+    bottomRight?: React.ReactElement<any>;
+    bottomLeft?: React.ReactElement<any>;
+    topLeft?: React.ReactElement<any>;
+  }
+
+  interface ResizableState {
+    isResizing: boolean;
+    size?: Size;
+    position?: Position;
+    rotate?: number;
+    scale?: number;
+    backgroundStyle: React.CSSProperties;
+  }
+
+  interface Delta {
     position: Position;
-    bounds: DraggableBounds | null;
-    size: Graphics.Size;
+    size: Size,
+    rotate: number;
+  }
+
+  type ResizeStartCallback = (
+    e: React.MouseEvent,
+    dir: ResizableDirection,
+    delta: Delta,
+  ) => void | boolean;
+
+  type ResizeCallback = (event: MouseEvent, direction: ResizableDirection, delta: Delta) => void;
+
+  export interface ResizableProps {
+    as?: string | React.ComponentType<any>;
+    style?: React.CSSProperties;
+    className?: string;
+    grid?: [number, number];
+    snap?: {
+      x?: number[];
+      y?: number[];
+    };
+    snapGap?: number;
+    bounds?: string | ResizableBounds;
+    // 添加需要的状态
+    size?: Size;
+    position?: Position;
+    rotate?: number;
+    minWidth?: number;
+    minHeight?: number;
+    maxWidth?: number;
+    maxHeight?: number;
+    lockAspectRatio?: boolean | number;
+    enable?: Enable;
+    handleStyles?: HandleStyles;
+    handleClasses?: HandleClassName;
+    handleWrapperStyle?: React.CSSProperties;
+    handleWrapperClass?: string;
+    handleComponent?: HandleComponent;
+    children?: React.ReactNode;
+    onResizeStart?: ResizeStartCallback;
+    onResize?: ResizeCallback;
+    onResizeStop?: ResizeCallback;
+    defaultSize?: Size;
+    defaultPosition?: Position;
+    scale?: number;
+    resizeRatio?: number;
+    canResizable?: boolean;
+    priorityStyle?: React.CSSProperties;
   }
 
 
-  export default class Draggable extends React.PureComponent<
-    DraggableProps,
-    DraggableState
+
+  export default class Resizable extends React.PureComponent<
+    ResizableProps,
+    ResizableState
   > {
-    draggableProvider: React.RefObject<DraggableProvider>;
-    mouseDownCache: Partial<MouseDownCache>;
+    resizableRef: React.RefObject<HTMLElement>;
   }
 }
 
-export = Draggable
-export as namespace Draggable
-export default Draggable;
+export = Resizable
+export as namespace Resizable
+export default Resizable;

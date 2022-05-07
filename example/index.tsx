@@ -1,52 +1,64 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
-import Draggable from './Draggable';
+// import { ReactComponent as ProSvg } from '@/asset/svg/pro_icon.svg';
+// import style from '../index.less';
+import Resizable from './Resizable';
+// import Draggable from '../components/Draggable';
 
-function DraggableTest() {
-  const [position, setPosition] = useState({
-    left: 100,
-    top: 100,
+export default function ResizableTest() {
+  const [frame, setFrame] = useState({
+    position: {
+      left: 50,
+      top: 50,
+    },
+    size: {
+      width: 100,
+      height: 100,
+    },
+    rotate: 30,
   });
-  const first = useRef();
-
-  useEffect(() => {
-    console.log(first);
-  }, []);
 
   const [canMoveable, setCanMoveable] = useState(true);
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLElement>();
-
+  // const [count, setCount] = useState(0);
+  console.log(frame);
   return (
     <div>
-      <Draggable
-        bounds="window"
-        canMoveable={canMoveable}
-        position={position}
-        scale={2}
-        // moveRatio={2}
-        nodeRef={ref}
-        onMouseUp={(e, d, position) => {
-          // setCount(count => count + 1);
-          // setPosition(position);
-          // // setTimeout(() => {
-          // //   setCanMoveable(false);
-          // // }, 1000);
-          // if (count > 100) {
-          //   return false;
-          // }
+      <Resizable
+        // bounds="parent"
+        position={frame.position}
+        size={frame.size}
+        enable={{
+          right: true,
+          bottomRight: true,
+          top: true,
+          topLeft: true,
+          topRight: true,
+          bottomLeft: true,
+          bottom: true,
+          left: true,
         }}
-        rotate={45}
+        // canResizable={canMoveable}
+        // className={style.app}
+        rotate={frame.rotate}
+        // lockAspectRatio={true}
+        onResize={(e, d, delta) => {
+          setFrame({
+            position: { ...delta.position },
+            size: { ...delta.size },
+            rotate: delta.rotate,
+          });
+        }}
+        style={{ width: 120, height: 100, border: '1px solid', display: 'block' }}
       >
-        <span style={{ width: 100, height: 100, border: '1px solid' }} ref={ref}></span>
-      </Draggable>
+
+      </Resizable>
     </div>
   );
 }
 
 ReactDOM.render(
   <React.StrictMode>
-    <DraggableTest />
+    <ResizableTest />
   </React.StrictMode>,
   document.getElementById('root'),
 );
