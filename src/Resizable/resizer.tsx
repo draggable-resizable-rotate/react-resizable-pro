@@ -1,6 +1,10 @@
 import React from 'react';
-import Graphics from '@shepijcanwu/graphics';
+import { Direction } from '@shepijcanwu/graphics';
 import DraggableProvider, { HandleFunMap } from '@shepijcanwu/react-draggable-provider';
+
+export type {
+  Direction
+};
 
 const styles: { [key: string]: React.CSSProperties } = {
   top: {
@@ -64,9 +68,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     cursor: 'nw-resize',
   },
 };
-
-export type Direction = Graphics.Direction;
-
 export type OnStartCallback = (e: React.MouseEvent, dir: Direction) => void;
 
 export interface Props {

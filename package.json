@@ -1,11 +1,11 @@
 {
-  "name": "@shepijcanwu/react-draggable-pro",
+  "name": "@shepijcanwu/react-resizable-pro",
   "version": "1.0.5",
-  "description": "to enhance react-draggable",
+  "description": "to enhance react-resizable",
   "keywords": [
     "react",
-    "draggable",
-    "draggable-pro"
+    "resizable",
+    "resizable-pro"
   ],
   "author": "shepijcanwu",
   "license": "ISC",

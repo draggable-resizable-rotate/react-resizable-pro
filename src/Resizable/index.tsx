@@ -6,29 +6,13 @@ import Graphics, {
   Rect,
   getElementDocumentRect,
   getRelativePoint,
+  Point,
+  LineEquation,
+  DirectionType,
+  LineDirection,
 } from '@shepijcanwu/graphics';
 
-const { parseMatrix } = Matrix;
-
-const {
-  drawRect,
-  getOppositeDirection,
-  getRotateRectPoints,
-  getValidDirectionIndex,
-  RECT_DIRECT,
-  RECT_LINE_DIRECTION,
-} = Rect;
-const {
-  get2LineIntersectionPoint,
-  getLineEquation,
-  getLineEquationByRotateAndPoint,
-  getPointToLineDistance,
-} = Line;
-
 export type ResizeDirection = Direction;
-type Point = Graphics.Point;
-type LineEquation = Graphics.LineEquation;
-type DirectionType = Graphics.DirectionType;
 export type ElementRect = Graphics.ElementRect;
 export type ResizeBounds = Omit<ElementRect, 'width' | 'height' | 'x' | 'y'>;
 
@@ -233,6 +217,24 @@ interface MouseDownCache {
   ratio?: number;
 }
 
+
+const { parseMatrix } = Matrix;
+
+const {
+  drawRect,
+  getOppositeDirection,
+  getRotateRectPoints,
+  getValidDirectionIndex,
+  RECT_DIRECT,
+  RECT_LINE_DIRECTION,
+} = Rect;
+const {
+  get2LineIntersectionPoint,
+  getLineEquation,
+  getLineEquationByRotateAndPoint,
+  getPointToLineDistance,
+} = Line;
+
 export default class Resizable extends React.PureComponent<ResizableProps, State> {
   resizableRef: React.RefObject<HTMLElement>;
 
@@ -337,7 +339,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
     const vRotate = 90 + rotate;
     // 触发的方向是顶角还是四边
     let directionType: DirectionType;
-    if (RECT_LINE_DIRECTION.includes(direction)) {
+    if (RECT_LINE_DIRECTION.includes(direction as LineDirection)) {
       directionType = 'line';
     } else {
       directionType = 'apex-angle';
@@ -466,8 +468,8 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
   onMouseDown(event: React.MouseEvent, direction: Direction) {
     const position = (this.props.position || this.state.position) as Position;
     const size = (this.props.size || this.state.size) as Size;
-    const rotate = (this.props.rotate || this.state.rotate) as number;
-    const scale = (this.props.scale || this.state.scale) as number;
+    const rotate = (this.props.rotate !== undefined ? this.props.rotate : this.state.rotate) as number;
+    const scale = (this.props.scale !== undefined ? this.props.scale : this.state.scale) as number;
     const { clientX, clientY } = event;
     const { lockAspectRatio } = this.props;
 
@@ -606,8 +608,8 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
   getJudgeSize(): MinMaxSize {
     let { maxWidth, maxHeight } = this.props;
     const { minWidth = 1, minHeight = 1 } = this.props;
-    const { bounds: boundsStr } = this.props;
-    if (!boundsStr) {
+    const { bounds } = this.props;
+    if (!bounds) {
       return {
         maxWidth,
         maxHeight,
@@ -615,16 +617,24 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
         minHeight,
       };
     }
+    if(typeof bounds === 'object') {
+      return {
+        maxWidth: bounds.right - bounds.left,
+        maxHeight: bounds.bottom - bounds.top,
+        minWidth: 0,
+        minHeight: 0,
+      };
+    }
 
     const element = this.resizableRef.current as HTMLElement;
     let boundsWidth = 0;
     let boundsHeight = 0;
-    if (boundsStr === 'window') {
+    if (bounds === 'window') {
       boundsWidth = window.innerWidth;
       boundsHeight = window.innerHeight;
     } else {
       let boundsElement: HTMLElement;
-      switch (boundsStr) {
+      switch (bounds) {
         case 'body': {
           boundsElement = document.body;
           break;
@@ -634,7 +644,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
           break;
         }
         default: {
-          const targetBounds = document.querySelector(boundsStr);
+          const targetBounds = document.querySelector(bounds);
           // 不存在 | 不是当前元素的父元素
           if (!targetBounds || !targetBounds.contains(element)) {
             throw new Error('bounds 必须存在，并且需要为拖动元素的祖先级别（包括父级）');
@@ -647,6 +657,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
     }
     maxWidth = Math.min(boundsWidth, maxWidth || boundsWidth);
     maxHeight = Math.min(boundsHeight, maxHeight || boundsWidth);
+
     return {
       maxWidth,
       maxHeight,
@@ -657,8 +668,11 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
 
   // 判断边界
   getJudgeBounds(validPosition: Position): ResizeBounds | null {
-    const { bounds: boundsStr } = this.props;
-    if (!boundsStr) return null;
+    const { bounds } = this.props;
+    if (!bounds) return null;
+    if (typeof bounds === 'object') {
+      return bounds;
+    }
     // 外层边界限制是字符串
     const element = this.resizableRef.current as HTMLElement;
     // 获取元素文档流的位置
@@ -666,7 +680,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
 
     let boundsElementRect: Omit<ElementRect, 'left' | 'top' | 'right' | 'bottom'>;
 
-    if (boundsStr === 'window') {
+    if (bounds === 'window') {
       boundsElementRect = {
         width: window.innerWidth,
         height: window.innerHeight,
@@ -675,7 +689,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
       };
     } else {
       let boundsElement: HTMLElement;
-      switch (boundsStr) {
+      switch (bounds) {
         case 'body': {
           boundsElement = document.body;
           break;
@@ -685,7 +699,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
           break;
         }
         default: {
-          const targetBounds = document.querySelector(boundsStr);
+          const targetBounds = document.querySelector(bounds);
           // 不存在 | 不是当前元素的父元素
           if (!targetBounds || !targetBounds.contains(element)) {
             throw new Error('bounds 必须存在，并且需要为拖动元素的祖先级别（包括父级）');
@@ -701,14 +715,12 @@ export default class Resizable extends React.PureComponent<ResizableProps, State
     const { x: boundsElementLeft, y: boundsElementTop } = boundsELementRelativePosition;
     const { width: boundsElementWidth, height: boundsElementHeight } = boundsElementRect;
 
-    const bounds = {
+    return {
       left: boundsElementLeft,
       top: boundsElementTop,
       right: boundsElementLeft + boundsElementWidth,
       bottom: boundsElementTop + boundsElementHeight,
     };
-
-    return bounds;
   }
 
   renderResizer() {

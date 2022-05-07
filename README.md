@@ -1,7 +1,7 @@
 # README
 
-source project[react-draggable](https://github.com/react-grid-layout/react-draggable)
+source project [re-resizable](https://github.com/bokuweb/re-resizable)
 
 ## background
 
-to enhance react-draggable ability => support rotate
+to enhance re-resizable ability => support rotate
