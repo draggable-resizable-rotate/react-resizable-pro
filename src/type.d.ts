@@ -113,7 +113,6 @@ declare namespace Resizable {
     scale?: number;
     resizeRatio?: number;
     canResizable?: boolean;
-    priorityStyle?: React.CSSProperties;
   }
 
 
@@ -127,6 +126,8 @@ declare namespace Resizable {
     onMouseMove: (event: MouseEvent, direction: Direction) => void;
     onMouseUp: (event: MouseEvent, direction: Direction) => void;
     getTransformStyle: React.CSSProperties;
+    updatePosition: (position: Position) => void;
+    updateSize: (size: Size) => void;
   }
 }
 

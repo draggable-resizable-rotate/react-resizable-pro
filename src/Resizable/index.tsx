@@ -126,7 +126,6 @@ export interface ResizableProps {
   scale?: number;
   resizeRatio?: number;
   canResizable?: boolean;
-  priorityStyle?: React.CSSProperties;
 }
 
 interface ResizableState {
@@ -169,7 +168,6 @@ const definedProps = [
   'defaultPosition',
   'rotate',
   'canResizable',
-  'priorityStyle',
 ];
 
 interface MouseDownCache {
@@ -784,6 +782,18 @@ export default class Resizable extends React.PureComponent<ResizableProps, Resiz
     return innerStyle;
   }
 
+  updatePosition(position: Position) {
+    this.setState({
+      position
+    });
+  }
+
+  updateSize(size: Size) {
+    this.setState({
+      size
+    });
+  }
+
   render() {
     const extendsProps = Object.keys(this.props).reduce((acc, key) => {
       if (definedProps.indexOf(key) !== -1) {
@@ -798,9 +808,8 @@ export default class Resizable extends React.PureComponent<ResizableProps, Resiz
     const style: React.CSSProperties = {
       position: 'relative',
       userSelect: this.state.isResizing ? 'none' : 'auto',
-      ...this.props.style,
       ...innerStyle,
-      ...this.props.priorityStyle,
+      ...this.props.style,
       maxWidth: this.props.maxWidth,
       maxHeight: this.props.maxHeight,
       minWidth: this.props.minWidth,
