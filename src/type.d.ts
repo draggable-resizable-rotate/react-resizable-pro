@@ -1,6 +1,6 @@
 import Graphics, {
   Direction, Size, Position,
-} from '@shepijcanwu/graphics';
+} from '@draggable-resizable-rotate/graphics';
 
 import React from 'react';
 declare namespace Resizable {

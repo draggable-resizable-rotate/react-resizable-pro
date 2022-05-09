@@ -55,8 +55,8 @@
     ]
   },
   "dependencies": {
-    "@draggable-resizable-rotate/graphics": "^1.0.0",
-    "@draggable-resizable-rotate/react-draggable-provider": "^1.0.0",
+    "@draggable-resizable-rotate/graphics": "^1.0.2",
+    "@draggable-resizable-rotate/react-draggable-provider": "^1.0.1",
     "core-js": "^3.20.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

@@ -13,7 +13,7 @@ import {
   Size,
   Position,
   ElementRect,
-} from '@shepijcanwu/graphics';
+} from '@draggable-resizable-rotate/graphics';
 
 export type ResizableDirection = Direction;
 export type ResizableBounds = Omit<ElementRect, 'width' | 'height' | 'x' | 'y'>;

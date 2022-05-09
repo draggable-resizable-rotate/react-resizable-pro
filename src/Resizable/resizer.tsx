@@ -1,6 +1,6 @@
 import React from 'react';
-import { Direction } from '@shepijcanwu/graphics';
-import DraggableProvider, { HandleFunMap } from '@shepijcanwu/react-draggable-provider';
+import { Direction } from '@draggable-resizable-rotate/graphics';
+import DraggableProvider, { HandleFunMap } from '@draggable-resizable-rotate/react-draggable-provider';
 
 export type {
   Direction
