@@ -123,6 +123,10 @@ declare namespace Resizable {
     ResizableState
   > {
     resizableRef: React.RefObject<HTMLElement>;
+    onMouseDown: (event: React.MouseEvent, direction: Direction) => void;
+    onMouseMove: (event: MouseEvent, direction: Direction) => void;
+    onMouseUp: (event: MouseEvent, direction: Direction) => void;
+    getTransformStyle: React.CSSProperties;
   }
 }
 

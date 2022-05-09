@@ -54,7 +54,7 @@
   },
   "dependencies": {
     "@shepijcanwu/graphics": "^1.3.2",
-    "@shepijcanwu/react-draggable-provider": "^1.0.4",
+    "@shepijcanwu/react-draggable-provider": "^1.0.6",
     "core-js": "^3.20.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
