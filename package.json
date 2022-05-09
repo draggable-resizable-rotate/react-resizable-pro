@@ -1,5 +1,5 @@
 {
-  "name": "@shepijcanwu/react-resizable-pro",
+  "name": "@draggable-resizable-rotate/react-resizable-pro",
   "version": "1.0.7",
   "description": "to enhance react-resizable",
   "keywords": [
@@ -27,7 +27,9 @@
     "runESlint": "eslint ./src --ext .js,.jsx,.ts,.tsx,.html",
     "runStylelint": "stylelint ./src/**/*.{css,less,sass,scss,html}",
     "runPrettierWrite": "prettier --write",
-    "publish-build": "webpack --config ./webpack.config.npm.js"
+    "pub-build": "webpack --config ./webpack.config.npm.js",
+    "pub": "publish build",
+    "patch": "version patch"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx,html}": [
@@ -53,8 +55,8 @@
     ]
   },
   "dependencies": {
-    "@shepijcanwu/graphics": "^1.3.2",
-    "@shepijcanwu/react-draggable-provider": "^1.0.6",
+    "@draggable-resizable-rotate/graphics": "^1.0.0",
+    "@draggable-resizable-rotate/react-draggable-provider": "^1.0.0",
     "core-js": "^3.20.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
