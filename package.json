@@ -28,7 +28,7 @@
     "runStylelint": "stylelint ./src/**/*.{css,less,sass,scss,html}",
     "runPrettierWrite": "prettier --write",
     "pub-build": "webpack --config ./webpack.config.npm.js",
-    "pub": "publish build",
+    "pub": "publish --access public",
     "patch": "version patch"
   },
   "lint-staged": {
