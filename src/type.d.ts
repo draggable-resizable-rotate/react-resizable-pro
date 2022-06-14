@@ -113,6 +113,7 @@ declare namespace Resizable {
     scale?: number;
     resizeRatio?: number;
     canResizable?: boolean;
+    transform?: string;
   }
 
 
