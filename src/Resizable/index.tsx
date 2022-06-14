@@ -126,6 +126,7 @@ export interface ResizableProps {
   scale?: number;
   resizeRatio?: number;
   canResizable?: boolean;
+  transform?: string;
 }
 
 interface ResizableState {
@@ -808,14 +809,18 @@ export default class Resizable extends React.PureComponent<ResizableProps, Resiz
     const style: React.CSSProperties = {
       position: 'relative',
       userSelect: this.state.isResizing ? 'none' : 'auto',
-      ...innerStyle,
       ...this.props.style,
+      ...innerStyle,
       maxWidth: this.props.maxWidth,
       maxHeight: this.props.maxHeight,
       minWidth: this.props.minWidth,
       minHeight: this.props.minHeight,
       boxSizing: 'border-box',
     };
+
+    if(this.props.transform !== undefined) {
+      style.transform = this.props.transform;
+    }
 
     const Wrapper = this.props.as || 'div';
 
