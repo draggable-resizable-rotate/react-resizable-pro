@@ -4,12 +4,12 @@ const getCSSModuleLocalIdent = require('react-dev-utils/getCSSModuleLocalIdent')
 const { DependEnvConfig } = require('./utils/env');
 const PathConfig = require('./utils/path');
 
-// const cssRegex = /\.css$/;
-const cssModuleRegex = /(\.module)?\.css$/;
-// const lessRegex = /\.(less)$/;
-const lessModuleRegex = /(\.module)?\.(less)$/;
-// const sassRegex = /\.(scss|sass)$/;
-const sassModuleRegex = /(\.module)?\.(scss|sass)$/;
+const cssRegex = /\.css$/;
+const cssModuleRegex = /\.module\.css$/;
+const lessRegex = /\.(less)$/;
+const lessModuleRegex = /\.module\.(less)$/;
+const sassRegex = /\.(scss|sass)$/;
+const sassModuleRegex = /\.module\.(scss|sass)$/;
 
 const {
   hasJsxRuntime,
@@ -195,18 +195,18 @@ module.exports = {
             compact: isEnvProduction,
           },
         },
-        // {
-        //   test: cssRegex,
-        //   exclude: cssModuleRegex,
-        //   use: getStyleLoaders({
-        //     importLoaders: 1,
-        //     modules: {
-        //       mode: 'icss',
-        //     },
-        //   }),
-        //   // 指定无法 tree shaking
-        //   sideEffects: true,
-        // },
+        {
+          test: cssRegex,
+          exclude: cssModuleRegex,
+          use: getStyleLoaders({
+            importLoaders: 1,
+            modules: {
+              mode: 'icss',
+            },
+          }),
+          // 指定无法 tree shaking
+          sideEffects: true,
+        },
         // css 模块化，如果使用就相当于没有载，不需要sideEffects
         {
           test: cssModuleRegex,
@@ -218,18 +218,18 @@ module.exports = {
             },
           }),
         },
-        // {
-        //   test: lessRegex,
-        //   exclude: lessModuleRegex,
-        //   use: [...getStyleLoaders({
-        //     importLoaders: 2,
-        //     modules: {
-        //       mode: 'icss',
-        //     },
-        //   }, 'less-loader')],
-        //   // 指定无法 tree shaking
-        //   sideEffects: true,
-        // },
+        {
+          test: lessRegex,
+          exclude: lessModuleRegex,
+          use: [...getStyleLoaders({
+            importLoaders: 2,
+            modules: {
+              mode: 'icss',
+            },
+          }, 'less-loader')],
+          // 指定无法 tree shaking
+          sideEffects: true,
+        },
         {
           test: lessModuleRegex,
           use: [...getStyleLoaders({
@@ -240,18 +240,18 @@ module.exports = {
             },
           }, 'less-loader')],
         },
-        // {
-        //   test: sassRegex,
-        //   exclude: sassModuleRegex,
-        //   use: [...getStyleLoaders({
-        //     importLoaders: 2,
-        //     modules: {
-        //       mode: 'icss',
-        //     },
-        //   }, 'sass-loader')],
-        //   // 指定无法 tree shaking
-        //   sideEffects: true,
-        // },
+        {
+          test: sassRegex,
+          exclude: sassModuleRegex,
+          use: [...getStyleLoaders({
+            importLoaders: 2,
+            modules: {
+              mode: 'icss',
+            },
+          }, 'sass-loader')],
+          // 指定无法 tree shaking
+          sideEffects: true,
+        },
         {
           test: sassModuleRegex,
           use: [...getStyleLoaders({
