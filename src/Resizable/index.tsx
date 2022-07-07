@@ -14,6 +14,7 @@ import {
   Position,
   ElementRect,
 } from '@draggable-resizable-rotate/graphics';
+import { addUserSelectStyles, removeUserSelectStyles } from './utils';
 
 export type ResizableDirection = Direction;
 export type ResizableBounds = Omit<ElementRect, 'width' | 'height' | 'x' | 'y'>;
@@ -194,6 +195,8 @@ interface MouseDownCache {
   };
   clientPoint?: ClientPoint;
   ratio?: number;
+  position?: Position;
+  size?: Size;
 }
 
 const { parseMatrix } = Matrix;
@@ -453,6 +456,12 @@ export default class Resizable extends React.PureComponent<ResizableProps, Resiz
     const { clientX, clientY } = event;
     const { lockAspectRatio } = this.props;
 
+    // 清除拖动鼠标默认行为
+    const element = this.resizableRef.current as HTMLElement;
+    addUserSelectStyles(element.ownerDocument);
+
+    this.mouseDownCache.position = position;
+    this.mouseDownCache.size = size;
     this.mouseDownCache.ratio =
       typeof lockAspectRatio === 'number' ? lockAspectRatio : size.width / size.height;
     this.mouseDownCache.rotateData = this.getRotateRect({
@@ -543,17 +552,33 @@ export default class Resizable extends React.PureComponent<ResizableProps, Resiz
   }
 
   onMouseUp(event: MouseEvent, direction: Direction) {
+    const { position: propsPosition, size: propsSize } = this.props;
+    const { position: mouseDownPosition, size: mouseDownSize } = this
+      .mouseDownCache as Required<MouseDownCache>;
     const { size, position } = this.state as Required<ResizableState>;
     const delta: ResizableDelta = {
       size: { ...size },
       position: { ...position },
     };
 
+
+    // 清除拖动鼠标默认行为
+    const element = this.resizableRef.current as HTMLElement;
+    removeUserSelectStyles(element.ownerDocument);
+
     this.setState({
       isResizing: false,
       backgroundStyle: { ...this.state.backgroundStyle, cursor: 'auto' },
+      position: propsPosition ? { ...propsPosition } : { ...mouseDownPosition },
+      size: propsSize ? { ...propsSize } : { ...mouseDownSize },
     });
     this.props.onResizeStop?.(event, direction, JSON.parse(JSON.stringify(delta)));
+  }
+
+  componentWillUnmount() {
+    // 清除拖动鼠标默认行为
+    const element = this.resizableRef.current as HTMLElement;
+    removeUserSelectStyles(element.ownerDocument);
   }
 
   getValidSize(size: Size, minMaxSize: MinMaxSize): Size {
@@ -785,13 +810,13 @@ export default class Resizable extends React.PureComponent<ResizableProps, Resiz
 
   updatePosition(position: Position) {
     this.setState({
-      position
+      position,
     });
   }
 
   updateSize(size: Size) {
     this.setState({
-      size
+      size,
     });
   }
 
@@ -808,7 +833,6 @@ export default class Resizable extends React.PureComponent<ResizableProps, Resiz
 
     const style: React.CSSProperties = {
       position: 'relative',
-      userSelect: this.state.isResizing ? 'none' : 'auto',
       ...this.props.style,
       ...innerStyle,
       maxWidth: this.props.maxWidth,
@@ -818,7 +842,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, Resiz
       boxSizing: 'border-box',
     };
 
-    if(this.props.transform !== undefined) {
+    if (this.props.transform !== undefined) {
       style.transform = this.props.transform;
     }
 
