@@ -14,7 +14,10 @@ import {
   Position,
   ElementRect,
 } from '@draggable-resizable-rotate/graphics';
-import { addUserSelectStyles, removeUserSelectStyles } from './utils';
+import {
+  addUserSelectStyles,
+  removeUserSelectStyles,
+} from '@draggable-resizable-rotate/react-draggable-provider';
 
 export type ResizableDirection = Direction;
 export type ResizableBounds = Omit<ElementRect, 'width' | 'height' | 'x' | 'y'>;
@@ -560,7 +563,6 @@ export default class Resizable extends React.PureComponent<ResizableProps, Resiz
       size: { ...size },
       position: { ...position },
     };
-
 
     // 清除拖动鼠标默认行为
     const element = this.resizableRef.current as HTMLElement;
