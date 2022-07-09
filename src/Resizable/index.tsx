@@ -660,7 +660,7 @@ export default class Resizable extends React.PureComponent<ResizableProps, Resiz
       boundsHeight = boundsElement.offsetHeight;
     }
     maxWidth = Math.min(boundsWidth, maxWidth || boundsWidth);
-    maxHeight = Math.min(boundsHeight, maxHeight || boundsWidth);
+    maxHeight = Math.min(boundsHeight, maxHeight || boundsHeight);
 
     return {
       maxWidth,
